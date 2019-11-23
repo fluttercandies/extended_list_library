@@ -1,8 +1,8 @@
 name: extended_list_library
-description: A new Flutter package.
+description: package library for extended_list and waterfall_flow, it provides core classes.
 version: 0.1.0
-author:
-homepage:
+author: zmtzawqlp <zmtzawqlp@live.com>
+homepage: https://github.com/fluttercandies/extended_list_library
 
 environment:
   sdk: ">=2.1.0 <3.0.0"

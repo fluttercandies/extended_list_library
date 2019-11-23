@@ -66,7 +66,7 @@ class ExtendedListDelegate {
   final bool closeToTrailing;
 }
 
-/// minxin of extended render
+/// minxin of extended list render
 ///
 mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
   /// call ViewportBuilder if it's not null

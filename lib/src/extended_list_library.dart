@@ -31,7 +31,7 @@ class ExtendedListDelegate {
   /// Notice: it should only for last child
   final LastChildLayoutTypeBuilder lastChildLayoutTypeBuilder;
 
-  /// Call when collect garbage, return garbage indexs to collect
+  /// Call when collect garbage, return indexs to collect
   final CollectGarbage collectGarbage;
 
   /// The builder to get indexs in viewport

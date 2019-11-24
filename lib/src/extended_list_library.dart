@@ -22,8 +22,10 @@ class ExtendedListDelegate {
     this.lastChildLayoutTypeBuilder,
     this.collectGarbage,
     this.viewportBuilder,
-    this.closeToTrailing,
-  });
+    this.closeToTrailing = false,
+  }) : assert(
+          closeToTrailing != null,
+        );
 
   /// The builder to get layout type of last child
   /// Notice: it should only for last child

@@ -31,7 +31,7 @@ class ExtendedListDelegate {
   /// Notice: it should only for last child
   final LastChildLayoutTypeBuilder lastChildLayoutTypeBuilder;
 
-  /// Call when collect garbage, return indexs to collect
+  /// Call when collect garbage, return indexes of children which are disposed to collect
   final CollectGarbage collectGarbage;
 
   /// The builder to get indexs in viewport
@@ -69,7 +69,7 @@ class ExtendedListDelegate {
 }
 
 /// minxin of extended list render
-///
+/// if sliver is all out of viewport then return [-1,-1] or nothing
 mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
   /// call ViewportBuilder if it's not null
   void callViewportBuilder({
@@ -79,25 +79,49 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
   }) {
     if (viewportBuilder == null) return;
 
-    int viewportFirstIndex = indexOf(firstChild);
-    int viewportLastIndex = indexOf(lastChild);
+    /// it's not go into viewport
+    if (firstChild == null ||
+        //sometime, remainingPaintExtent is not zero though sliver is not go into viewport
+        //maybe this is issue for viewport
+        (constraints.precedingScrollExtent != 0.0 &&
+            constraints.remainingPaintExtent == 0)) return;
+
+    int viewportFirstIndex = -1;
+    int viewportLastIndex = -1;
 
     RenderBox viewportFirstChild = firstChild;
-    while (childScrollOffset(viewportFirstChild) +
-            (getPaintExtend != null
-                ? getPaintExtend(viewportFirstChild)
-                : paintExtentOf(viewportFirstChild)) <=
-        constraints.scrollOffset) {
+    while (true) {
+      final layoutOffset = childScrollOffset(viewportFirstChild);
+      final trailingOffset = layoutOffset +
+          (getPaintExtend != null
+              ? getPaintExtend(viewportFirstChild)
+              : paintExtentOf(viewportFirstChild));
+      if (layoutOffset <= constraints.scrollOffset &&
+          constraints.scrollOffset < trailingOffset) {
+        viewportFirstIndex = indexOf(viewportFirstChild);
+        break;
+      }
       viewportFirstChild = childAfter(viewportFirstChild);
+      if (viewportFirstChild == null) break;
     }
-    viewportFirstIndex = indexOf(viewportFirstChild);
 
     RenderBox viewportLastChild = lastChild;
-    while (childScrollOffset(viewportLastChild) >
-        constraints.remainingPaintExtent + constraints.scrollOffset) {
+
+    while (true) {
+      final layoutOffset = childScrollOffset(viewportLastChild);
+      final trailingOffset = layoutOffset +
+          (getPaintExtend != null
+              ? getPaintExtend(viewportLastChild)
+              : paintExtentOf(viewportLastChild));
+      if (layoutOffset <
+              constraints.scrollOffset + constraints.remainingPaintExtent &&
+          trailingOffset >= constraints.scrollOffset) {
+        viewportLastIndex = indexOf(viewportLastChild);
+        break;
+      }   
       viewportLastChild = childBefore(viewportLastChild);
+      if (viewportLastChild == null) break;
     }
-    viewportLastIndex = indexOf(viewportLastChild);
 
     viewportBuilder(viewportFirstIndex, viewportLastIndex);
   }

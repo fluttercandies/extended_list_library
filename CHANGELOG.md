@@ -1,3 +1,7 @@
+## [0.1.3]
+
+* fix issue about wrong viewport indexes.
+  
 ## [0.1.2]
 
 * format code.

@@ -1,11 +1,16 @@
+## [1.0.0]
+
+* breaking change: fix typo(fullCrossAxisExtend => fullCrossAxisExtent)
+* fix analysis_options.yaml
+
 ## [0.1.3]
 
 * fix issue about wrong viewport indexes.
-  
+
 ## [0.1.2]
 
 * format code.
-  
+
 ## [0.1.1]
 
 * add closeToTrailing property for ExtendedListDelegate.

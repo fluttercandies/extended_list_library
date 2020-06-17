@@ -1,18 +1,19 @@
+
 import 'package:flutter/rendering.dart';
-import "typedef.dart";
+import 'typedef.dart';
 
 enum LastChildLayoutType {
   /// as default child
   none,
 
-  /// follow max child trailing layout offset and layout with full cross axis extend
-  /// last child as loadmore item/no more item in [ExtendedGridView] and [WaterfallFlow]
+  /// follow max child trailing layout offset and layout with full cross-axis extent
+  /// last child as load more item/no more item in [ExtendedGridView] and [WaterfallFlow]
   /// with full cross axis extend
-  fullCrossAxisExtend,
+  fullCrossAxisExtent,
 
   /// as foot at trailing and layout with full cross axis extend
   /// show no more item at trailing when children are not full of viewport
-  /// if children is full of viewport, it's the same as fullCrossAxisExtend
+  /// if children is full of viewport, it's the same as fullCrossAxisExtent
   foot,
 }
 
@@ -34,7 +35,7 @@ class ExtendedListDelegate {
   /// Call when collect garbage, return indexes of children which are disposed to collect
   final CollectGarbage collectGarbage;
 
-  /// The builder to get indexs in viewport
+  /// The builder to get indexes in viewport
   final ViewportBuilder viewportBuilder;
 
   /// when reverse property of List is true, layout is as following.
@@ -68,7 +69,7 @@ class ExtendedListDelegate {
   final bool closeToTrailing;
 }
 
-/// minxin of extended list render
+/// mixin of extended list render
 /// if sliver is all out of viewport then return [-1,-1] or nothing
 mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
   /// call ViewportBuilder if it's not null
@@ -77,22 +78,26 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
     //ExtentList and GridView can't use paintExtentOf
     PaintExtentOf getPaintExtend,
   }) {
-    if (viewportBuilder == null) return;
+    if (viewportBuilder == null) {
+      return;
+    }
 
     /// it's not go into viewport
     if (firstChild == null ||
         //sometime, remainingPaintExtent is not zero though sliver is not go into viewport
         //maybe this is issue for viewport
         (constraints.precedingScrollExtent != 0.0 &&
-            constraints.remainingPaintExtent == 0)) return;
+            constraints.remainingPaintExtent == 0)) {
+      return;
+    }
 
     int viewportFirstIndex = -1;
     int viewportLastIndex = -1;
 
     RenderBox viewportFirstChild = firstChild;
     while (true) {
-      final layoutOffset = childScrollOffset(viewportFirstChild);
-      final trailingOffset = layoutOffset +
+      final double layoutOffset = childScrollOffset(viewportFirstChild);
+      final double trailingOffset = layoutOffset +
           (getPaintExtend != null
               ? getPaintExtend(viewportFirstChild)
               : paintExtentOf(viewportFirstChild));
@@ -102,14 +107,16 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
         break;
       }
       viewportFirstChild = childAfter(viewportFirstChild);
-      if (viewportFirstChild == null) break;
+      if (viewportFirstChild == null) {
+        break;
+      }
     }
 
     RenderBox viewportLastChild = lastChild;
 
     while (true) {
-      final layoutOffset = childScrollOffset(viewportLastChild);
-      final trailingOffset = layoutOffset +
+      final double layoutOffset = childScrollOffset(viewportLastChild);
+      final double trailingOffset = layoutOffset +
           (getPaintExtend != null
               ? getPaintExtend(viewportLastChild)
               : paintExtentOf(viewportLastChild));
@@ -118,9 +125,11 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
           trailingOffset >= constraints.scrollOffset) {
         viewportLastIndex = indexOf(viewportLastChild);
         break;
-      }   
+      }
       viewportLastChild = childBefore(viewportLastChild);
-      if (viewportLastChild == null) break;
+      if (viewportLastChild == null) {
+        break;
+      }
     }
 
     viewportBuilder(viewportFirstIndex, viewportLastIndex);
@@ -134,18 +143,20 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
     int firstIndex,
     int targetLastIndex,
   }) {
-    if (collectGarbage == null) return;
+    if (collectGarbage == null) {
+      return;
+    }
 
-    List<int> garbages = [];
+    final List<int> garbages = <int>[];
     firstIndex ??= indexOf(firstChild);
     targetLastIndex ??= indexOf(lastChild);
-    for (var i = leadingGarbage; i > 0; i--) {
+    for (int i = leadingGarbage; i > 0; i--) {
       garbages.add(firstIndex - i);
     }
-    for (var i = 0; i < trailingGarbage; i++) {
+    for (int i = 0; i < trailingGarbage; i++) {
       garbages.add(targetLastIndex + i);
     }
-    if (garbages.length != 0) {
+    if (garbages.isNotEmpty) {
       //call collectGarbage
       collectGarbage.call(garbages);
     }
@@ -155,11 +166,11 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
   void handleCloseToTrailingBegin(bool closeToTrailing) {
     if (closeToTrailing) {
       RenderBox child = firstChild;
-      SliverMultiBoxAdaptorParentData childParentData = child.parentData;
+      SliverMultiBoxAdaptorParentData childParentData = child.parentData as SliverMultiBoxAdaptorParentData;
       if (childParentData.index == 0 && childParentData.layoutOffset != 0) {
-        var distance = childParentData.layoutOffset;
+        final double distance = childParentData.layoutOffset;
         while (child != null) {
-          childParentData = child.parentData;
+          childParentData = child.parentData as SliverMultiBoxAdaptorParentData;
           childParentData.layoutOffset -= distance;
           child = childAfter(child);
         }
@@ -172,10 +183,10 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
       bool closeToTrailing, double endScrollOffset) {
     if (closeToTrailing && endScrollOffset < constraints.remainingPaintExtent) {
       RenderBox child = firstChild;
-      final distance = constraints.remainingPaintExtent - endScrollOffset;
+      final double distance = constraints.remainingPaintExtent - endScrollOffset;
       while (child != null) {
         final SliverMultiBoxAdaptorParentData childParentData =
-            child.parentData;
+            child.parentData as SliverMultiBoxAdaptorParentData;
         childParentData.layoutOffset += distance;
         child = childAfter(child);
       }

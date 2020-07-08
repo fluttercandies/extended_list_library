@@ -1,3 +1,7 @@
+## [1.0.1]
+
+* fix viewport wrong index for SliverGrid. [ExtendedList]#4
+
 ## [1.0.0]
 
 * breaking change: fix typo(fullCrossAxisExtend => fullCrossAxisExtent)

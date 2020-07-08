@@ -1,4 +1,3 @@
-
 import 'package:flutter/rendering.dart';
 import 'typedef.dart';
 
@@ -77,6 +76,7 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
     ViewportBuilder viewportBuilder,
     //ExtentList and GridView can't use paintExtentOf
     PaintExtentOf getPaintExtend,
+    double mainAxisSpacing,
   }) {
     if (viewportBuilder == null) {
       return;
@@ -93,7 +93,7 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
 
     int viewportFirstIndex = -1;
     int viewportLastIndex = -1;
-
+    mainAxisSpacing ??= 0;
     RenderBox viewportFirstChild = firstChild;
     while (true) {
       final double layoutOffset = childScrollOffset(viewportFirstChild);
@@ -101,7 +101,8 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
           (getPaintExtend != null
               ? getPaintExtend(viewportFirstChild)
               : paintExtentOf(viewportFirstChild));
-      if (layoutOffset <= constraints.scrollOffset &&
+      if (layoutOffset - (layoutOffset == 0 ? 0 : mainAxisSpacing) <=
+              constraints.scrollOffset &&
           constraints.scrollOffset < trailingOffset) {
         viewportFirstIndex = indexOf(viewportFirstChild);
         break;
@@ -166,7 +167,8 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
   void handleCloseToTrailingBegin(bool closeToTrailing) {
     if (closeToTrailing) {
       RenderBox child = firstChild;
-      SliverMultiBoxAdaptorParentData childParentData = child.parentData as SliverMultiBoxAdaptorParentData;
+      SliverMultiBoxAdaptorParentData childParentData =
+          child.parentData as SliverMultiBoxAdaptorParentData;
       if (childParentData.index == 0 && childParentData.layoutOffset != 0) {
         final double distance = childParentData.layoutOffset;
         while (child != null) {
@@ -183,7 +185,8 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
       bool closeToTrailing, double endScrollOffset) {
     if (closeToTrailing && endScrollOffset < constraints.remainingPaintExtent) {
       RenderBox child = firstChild;
-      final double distance = constraints.remainingPaintExtent - endScrollOffset;
+      final double distance =
+          constraints.remainingPaintExtent - endScrollOffset;
       while (child != null) {
         final SliverMultiBoxAdaptorParentData childParentData =
             child.parentData as SliverMultiBoxAdaptorParentData;

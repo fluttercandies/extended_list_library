@@ -165,36 +165,55 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
 
   /// handle closeToTrailing at begin
   void handleCloseToTrailingBegin(bool closeToTrailing) {
-    if (closeToTrailing) {
-      RenderBox child = firstChild;
-      SliverMultiBoxAdaptorParentData childParentData =
-          child.parentData as SliverMultiBoxAdaptorParentData;
-      if (childParentData.index == 0 && childParentData.layoutOffset != 0) {
-        final double distance = childParentData.layoutOffset;
-        while (child != null) {
-          childParentData = child.parentData as SliverMultiBoxAdaptorParentData;
-          childParentData.layoutOffset -= distance;
-          child = childAfter(child);
-        }
-      }
-    }
+    _closeToTrailingDistance = null;
+    // if (closeToTrailing) {
+    //   RenderBox child = firstChild;
+    //   SliverMultiBoxAdaptorParentData childParentData =
+    //       child.parentData as SliverMultiBoxAdaptorParentData;
+    //   if (childParentData.index == 0 && childParentData.layoutOffset != 0) {
+    //     final double distance = childParentData.layoutOffset;
+    //     while (child != null) {
+    //       childParentData = child.parentData as SliverMultiBoxAdaptorParentData;
+    //       childParentData.layoutOffset -= distance;
+    //       child = childAfter(child);
+    //     }
+    //   }
+    // }
   }
 
   /// handle closeToTrailing at end
   double handleCloseToTrailingEnd(
       bool closeToTrailing, double endScrollOffset) {
     if (closeToTrailing && endScrollOffset < constraints.remainingPaintExtent) {
-      RenderBox child = firstChild;
+      //RenderBox child = firstChild;
       final double distance =
           constraints.remainingPaintExtent - endScrollOffset;
-      while (child != null) {
-        final SliverMultiBoxAdaptorParentData childParentData =
-            child.parentData as SliverMultiBoxAdaptorParentData;
-        childParentData.layoutOffset += distance;
-        child = childAfter(child);
-      }
+      _closeToTrailingDistance = distance;
+      // while (child != null) {
+      //   final SliverMultiBoxAdaptorParentData childParentData =
+      //       child.parentData as SliverMultiBoxAdaptorParentData;
+      //   childParentData.layoutOffset += distance;
+      //   child = childAfter(child);
+      // }
       return constraints.remainingPaintExtent;
     }
     return endScrollOffset;
+  }
+
+  double _closeToTrailingDistance;
+
+  double get closeToTrailingDistance => _closeToTrailingDistance ?? 0.0;
+
+  bool get closeToTrailing => extendedListDelegate?.closeToTrailing ?? false;
+
+  ExtendedListDelegate get extendedListDelegate;
+
+  @override
+  double childScrollOffset(RenderObject child) {
+    assert(child != null);
+    assert(child.parent == this);
+    final SliverMultiBoxAdaptorParentData childParentData =
+        child.parentData as SliverMultiBoxAdaptorParentData;
+    return childParentData.layoutOffset + closeToTrailingDistance;
   }
 }

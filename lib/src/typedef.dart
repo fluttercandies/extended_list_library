@@ -14,4 +14,4 @@ typedef CollectGarbage = void Function(List<int> garbages);
 typedef ViewportBuilder = void Function(int firstIndex, int lastIndex);
 
 /// Return paint extent of child
-typedef PaintExtentOf = double Function(RenderBox child);
+typedef PaintExtentOf = double Function(RenderBox? child);

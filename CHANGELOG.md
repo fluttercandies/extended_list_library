@@ -1,3 +1,7 @@
+## 3.0.0
+
+* support null-safety
+
 ## 2.0.0
 
 * fix closeToTrailing issue. extended_list#6

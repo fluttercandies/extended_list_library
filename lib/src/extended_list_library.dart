@@ -23,19 +23,17 @@ class ExtendedListDelegate {
     this.collectGarbage,
     this.viewportBuilder,
     this.closeToTrailing = false,
-  }) : assert(
-          closeToTrailing != null,
-        );
+  });
 
   /// The builder to get layout type of last child
   /// Notice: it should only for last child
-  final LastChildLayoutTypeBuilder lastChildLayoutTypeBuilder;
+  final LastChildLayoutTypeBuilder? lastChildLayoutTypeBuilder;
 
   /// Call when collect garbage, return indexes of children which are disposed to collect
-  final CollectGarbage collectGarbage;
+  final CollectGarbage? collectGarbage;
 
   /// The builder to get indexes in viewport
-  final ViewportBuilder viewportBuilder;
+  final ViewportBuilder? viewportBuilder;
 
   /// when reverse property of List is true, layout is as following.
   /// it likes chat list, and new session will insert to zero index
@@ -73,10 +71,10 @@ class ExtendedListDelegate {
 mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
   /// call ViewportBuilder if it's not null
   void callViewportBuilder({
-    ViewportBuilder viewportBuilder,
+    ViewportBuilder? viewportBuilder,
     //ExtentList and GridView can't use paintExtentOf
-    PaintExtentOf getPaintExtend,
-    double mainAxisSpacing,
+    PaintExtentOf? getPaintExtend,
+    double mainAxisSpacing = 0,
   }) {
     if (viewportBuilder == null) {
       return;
@@ -93,10 +91,9 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
 
     int viewportFirstIndex = -1;
     int viewportLastIndex = -1;
-    mainAxisSpacing ??= 0;
-    RenderBox viewportFirstChild = firstChild;
+    RenderBox? viewportFirstChild = firstChild;
     while (true) {
-      final double layoutOffset = childScrollOffset(viewportFirstChild);
+      final double layoutOffset = childScrollOffset(viewportFirstChild!)!;
       final double trailingOffset = layoutOffset +
           (getPaintExtend != null
               ? getPaintExtend(viewportFirstChild)
@@ -113,10 +110,10 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
       }
     }
 
-    RenderBox viewportLastChild = lastChild;
+    RenderBox? viewportLastChild = lastChild;
 
     while (true) {
-      final double layoutOffset = childScrollOffset(viewportLastChild);
+      final double layoutOffset = childScrollOffset(viewportLastChild!)!;
       final double trailingOffset = layoutOffset +
           (getPaintExtend != null
               ? getPaintExtend(viewportLastChild)
@@ -138,23 +135,23 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
 
   /// call CollectGarbage if it's not null
   void callCollectGarbage({
-    CollectGarbage collectGarbage,
-    int leadingGarbage,
-    int trailingGarbage,
-    int firstIndex,
-    int targetLastIndex,
+    CollectGarbage? collectGarbage,
+    int? leadingGarbage,
+    int? trailingGarbage,
+    int? firstIndex,
+    int? targetLastIndex,
   }) {
     if (collectGarbage == null) {
       return;
     }
 
     final List<int> garbages = <int>[];
-    firstIndex ??= indexOf(firstChild);
-    targetLastIndex ??= indexOf(lastChild);
-    for (int i = leadingGarbage; i > 0; i--) {
+    firstIndex ??= indexOf(firstChild!);
+    targetLastIndex ??= indexOf(lastChild!);
+    for (int i = leadingGarbage!; i > 0; i--) {
       garbages.add(firstIndex - i);
     }
-    for (int i = 0; i < trailingGarbage; i++) {
+    for (int i = 0; i < trailingGarbage!; i++) {
       garbages.add(targetLastIndex + i);
     }
     if (garbages.isNotEmpty) {
@@ -200,20 +197,19 @@ mixin ExtendedRenderObjectMixin on RenderSliverMultiBoxAdaptor {
     return endScrollOffset;
   }
 
-  double _closeToTrailingDistance;
+  double? _closeToTrailingDistance;
 
   double get closeToTrailingDistance => _closeToTrailingDistance ?? 0.0;
 
-  bool get closeToTrailing => extendedListDelegate?.closeToTrailing ?? false;
+  bool get closeToTrailing => extendedListDelegate.closeToTrailing;
 
   ExtendedListDelegate get extendedListDelegate;
 
   @override
-  double childScrollOffset(RenderObject child) {
-    assert(child != null);
+  double? childScrollOffset(RenderObject child) {
     assert(child.parent == this);
     final SliverMultiBoxAdaptorParentData childParentData =
         child.parentData as SliverMultiBoxAdaptorParentData;
-    return childParentData.layoutOffset + closeToTrailingDistance;
+    return childParentData.layoutOffset! + closeToTrailingDistance;
   }
 }
